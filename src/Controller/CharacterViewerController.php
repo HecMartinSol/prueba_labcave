@@ -12,10 +12,6 @@ class CharacterViewerController extends AbstractController
      */
     public function index()
     {
-        $number = random_int(0, 100);
-
-        return $this->render('number.html.twig', [
-            'number' => $number,
-        ]);
+        return $this->render('character_viewer.html.twig');
     }
 }
