@@ -1,6 +1,11 @@
 LAB CAVE SKILL TEST
 =======================
 
+- [LAB CAVE SKILL TEST](#lab-cave-skill-test)
+  - [Main description](#main-description)
+  - [Installing Symfony](#installing-symfony)
+  - [Details](#details)
+
 ## Main description
 Create and develop a catalog with the characters from the Star Wars movies using an external API Swapi.co ( https://swapi.co/documentation )
 
@@ -44,3 +49,9 @@ http://127.0.0.1:8000/get/characters
 Which admits the following parameters
 - page [int]: number of page you want to retrieve (default 1)
 - noCache [boolean]: determines if cached data is being used or not (default false)
+
+Using cache, each request will be cached for 5 minutes.
+This value can be modified changing the variable
+```
+const MINS_TO_EXPIRE_CACHE = 5 @ src\StarWarsService.php
+```
