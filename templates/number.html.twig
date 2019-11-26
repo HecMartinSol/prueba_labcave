@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>PRUEBA LAB CAVE</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jq-3.3.1/dt-1.10.20/datatables.min.css"/>
+</head>
+<body>
+
+
+    <div class="container m-4 p-4">
+        <h1 class="h1">LAB CAVE CODE TEST</h1>
+
+        <h3 class="h3">Showing page <span id="currpage">1</span></h3>
+        <div class="container">
+            <table id="characters_table" class="table table-striped table-bordered" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Height</th>
+                        <th>Mass</th>
+                        <th>Hair color</th>
+                        <th>Skin color</th>
+                        <th>Eye color</th>
+                        <th>Birth year</th>
+                        <th>Gender</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+            <div class="container">
+                <img style="display:none" src="https://cdnjs.cloudflare.com/ajax/libs/galleriffic/2.0.1/css/loader.gif" id="img_loading">
+            <div>
+
+            <div class="container">
+                <button style="display:none" id="previous_btn">Prev</button>
+                <button style="display:none" id="next_btn">Next</button>
+            <div>
+        </div>
+    </div>
+
+
+
+
+
+    {% block javascripts %}
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jq-3.3.1/dt-1.10.20/datatables.min.js"></script>
+
+        <script>
+            const swapi_requester = {
+                page_shown: 1,
+                
+                /**
+                 * Make the full process of getting and drawing a page of data
+                 * 
+                 * @param page
+                 */
+                setupDatatable: function (page) {
+                    swapi_requester.page_shown = page,
+                        $("#currpage").html(swapi_requester.page_shown);
+
+                    swapi_requester.disableButton("next");
+                    swapi_requester.disableButton("previous");
+                    swapi_requester.toggleLoading();
+                    swapi_requester.clearRows();
+
+                    swapi_requester.getCharacters(page, function (response) {
+                        swapi_requester.drawResponse(response);
+                    });
+                },
+                /**
+                 * Draw the response data obtained on the table
+                 * 
+                 * @param response
+                 */
+                drawResponse: function (response) {
+                    var msg = response.message;
+                    for (let i = 0; i < msg.results.length; i++) {
+                        const r = msg.results[i];
+                        swapi_requester.addRow(r);
+                    }
+
+                    if (msg.next != null) {
+                        var page = swapi_requester.getPageFromLink(msg.next);
+                        swapi_requester.enableButton("next", page);
+                    }
+                    else
+                        swapi_requester.disableButton("next");
+
+                    if (msg.previous != null) {
+                        var page = swapi_requester.getPageFromLink(msg.previous);
+                        swapi_requester.enableButton("previous", page);
+                    }
+                    else
+                        swapi_requester.disableButton("previous");
+
+                    swapi_requester.toggleLoading();
+
+
+                },
+                /**
+                 * Get de number of page using a link to the api
+                 * @param link
+                 */
+                getPageFromLink: function (link) {
+                    // https://swapi.co/api/people/?page=2
+                    return link.split("=").pop();
+                },
+                /**
+                 * Switch visibility of the loading image
+                 * @param 
+                 */
+                toggleLoading: function () {
+                    $("#img_loading").fadeToggle(500);
+                },
+                /**
+                 * Enable a button and sets its action to load another page
+                 * @param btn
+                 * @param page
+                 */
+                enableButton: function (btn, page) {
+
+                    $("#" + btn + "_btn").attr("onclick", "swapi_requester.setupDatatable(" + page + ")");
+                    $("#" + btn + "_btn").fadeIn(500);
+                },
+                /**
+                 * Disables and hides a button
+                 * @param btn
+                 */
+                disableButton: function (btn) {
+
+                    $("#" + btn + "_btn").removeAttr("onclick");
+                    $("#" + btn + "_btn").fadeOut(500);
+                },
+                /**
+                 * Clear the rows of the datatable
+                 * @param 
+                 */
+                clearRows: function () {
+                    var dataTable = $('#characters_table').DataTable();
+
+                    dataTable.clear().draw();
+                },
+                /**
+                 * Add a row to the character datatable
+                 * @param character
+                 */
+                addRow: function (character) {
+                    var dataTable = $('#characters_table').DataTable();
+
+                    dataTable.row.add([
+                        character.name,
+                        character.height,
+                        character.mass,
+                        character.hair_color,
+                        character.skin_color,
+                        character.eye_color,
+                        character.birth_year,
+                        character.gender
+                    ]).draw(false);
+                },
+                /**
+                 * Makes the AJAX request to the server and returns the result
+                 * once obtained data
+                 * 
+                 * @param page
+                 * @param callback
+                 */
+                getCharacters: function (page = 1, callback) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/get/characters",
+                        data: {
+                            page: page
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            return callback(response);
+                        }
+                    });
+                }
+            }
+
+
+            $(document).ready(function () {
+                var t = $('#characters_table').DataTable({
+                    paging: false,
+                    processing: true,
+                });
+
+                swapi_requester.setupDatatable(1);
+            });
+        </script>
+    {% endblock %}
+</body>
+</html>

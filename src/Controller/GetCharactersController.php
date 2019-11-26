@@ -25,7 +25,7 @@ class GetCharactersController extends AbstractController
      * @param Request $request
      * @return void
      * 
-     * @Route("/get/characters", name="get_characters", )
+     * @Route("/get/characters", name="get_characters", methods={"POST"})
      */
     public function index(Request $request)
     {
