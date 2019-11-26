@@ -34,7 +34,7 @@ class GuzzleClient
      * @return string
      * @throws Exception
      */
-    public function get($url, $headers = [], $addProxy = false)
+    public function get($url, $headers = [])
     {
         try {
 

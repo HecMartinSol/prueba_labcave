@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -13,12 +14,28 @@ use Symfony\Component\HttpFoundation\Response;
 class StarWarsService
 {   
     protected $guzzle = null;
+    protected $useCache = null;
+    protected $cache = null;
 
     const API_ENDPOINT = "https://swapi.co/api";
+    const MINS_TO_EXPIRE_CACHE = 5;
     
     public function __construct(GuzzleClient $guzzle)
     {
+        $this->useCache = true;
         $this->guzzle = $guzzle;
+        $this->cache = new FilesystemAdapter();
+    }
+
+    /**
+     * Sets the use of cache in the service
+     *
+     * @param boolean $useCache
+     * @return void
+     */
+    public function setCacheUsage(bool $useCache = true)
+    {
+        $this->useCache = $useCache;
     }
 
     /**
@@ -33,8 +50,20 @@ class StarWarsService
         try {
             if($page < 1)
                 throw new Exception("Page number must be greater than 1", Response::HTTP_BAD_REQUEST);
+            
+            $cacheTag = "starwars.getPeople.{$page}";
+            $cachedRes = $this->cache->getItem($cacheTag);
+            #   If not using cache or the value is not already cached...
+            if(!$this->useCache || !$cachedRes->isHit()){
+                $res = $this->guzzle->get(self::API_ENDPOINT . "/people/?page=".$page);
                 
-            $res = $this->guzzle->get(self::API_ENDPOINT . "/people/?page=".$page);
+                $cachedRes->set($res);
+                $cachedRes->expiresAfter(self::MINS_TO_EXPIRE_CACHE * 60);
+
+                $this->cache->save($cachedRes);
+            } else {
+                $res = $cachedRes->get();
+            }
 
             return json_decode($res);
         } catch (\Exception $e) {
@@ -55,8 +84,20 @@ class StarWarsService
             
             if($page < 1)
                 throw new Exception("Page number must be greater than 1", Response::HTTP_BAD_REQUEST);
+            
+            $cacheTag = "starwars.getFilms.{$page}";
+            $cachedRes = $this->cache->getItem($cacheTag);
+            #   If not using cache or the value is not already cached...
+            if(!$this->useCache || !$cachedRes->isHit()){
+                $res = $this->guzzle->get(self::API_ENDPOINT . "/films/?page=".$page);
                 
-            $res = $this->guzzle->get(self::API_ENDPOINT . "/films/?page=".$page);
+                $cachedRes->set($res);
+                $cachedRes->expiresAfter(self::MINS_TO_EXPIRE_CACHE * 60);
+
+                $this->cache->save($cachedRes);
+            } else {
+                $res = $cachedRes->get();
+            }
             
             return json_decode($res);
 
@@ -78,8 +119,20 @@ class StarWarsService
             
             if($page < 1)
                 throw new Exception("Page number must be greater than 1", Response::HTTP_BAD_REQUEST);
+            
+            $cacheTag = "starwars.getPlanets.{$page}";
+            $cachedRes = $this->cache->getItem($cacheTag);
+            #   If not using cache or the value is not already cached...
+            if(!$this->useCache || !$cachedRes->isHit()){
+                $res = $this->guzzle->get(self::API_ENDPOINT . "/planets/?page=".$page);
                 
-            $res = $this->guzzle->get(self::API_ENDPOINT . "/planets/?page=".$page);
+                $cachedRes->set($res);
+                $cachedRes->expiresAfter(self::MINS_TO_EXPIRE_CACHE * 60);
+
+                $this->cache->save($cachedRes);
+            } else {
+                $res = $cachedRes->get();
+            }
             
             return json_decode($res);
 
@@ -101,8 +154,20 @@ class StarWarsService
             
             if($page < 1)
                 throw new Exception("Page number must be greater than 1", Response::HTTP_BAD_REQUEST);
+            
+            $cacheTag = "starwars.getSpecies.{$page}";
+            $cachedRes = $this->cache->getItem($cacheTag);
+            #   If not using cache or the value is not already cached...
+            if(!$this->useCache || !$cachedRes->isHit()){
+                $res = $this->guzzle->get(self::API_ENDPOINT . "/species/?page=".$page);
                 
-            $res = $this->guzzle->get(self::API_ENDPOINT . "/species/?page=".$page);
+                $cachedRes->set($res);
+                $cachedRes->expiresAfter(self::MINS_TO_EXPIRE_CACHE * 60);
+
+                $this->cache->save($cachedRes);
+            } else {
+                $res = $cachedRes->get();
+            }
             
             return json_decode($res);
 
@@ -124,8 +189,20 @@ class StarWarsService
             
             if($page < 1)
                 throw new Exception("Page number must be greater than 1", Response::HTTP_BAD_REQUEST);
+            
+            $cacheTag = "starwars.getStarships.{$page}";
+            $cachedRes = $this->cache->getItem($cacheTag);
+            #   If not using cache or the value is not already cached...
+            if(!$this->useCache || !$cachedRes->isHit()){
+                $res = $this->guzzle->get(self::API_ENDPOINT . "/starships/?page=".$page);
                 
-            $res = $this->guzzle->get(self::API_ENDPOINT . "/starships/?page=".$page);
+                $cachedRes->set($res);
+                $cachedRes->expiresAfter(self::MINS_TO_EXPIRE_CACHE * 60);
+
+                $this->cache->save($cachedRes);
+            } else {
+                $res = $cachedRes->get();
+            }
             
             return json_decode($res);
 
@@ -147,8 +224,20 @@ class StarWarsService
             
             if($page < 1)
                 throw new Exception("Page number must be greater than 1", Response::HTTP_BAD_REQUEST);
+            
+            $cacheTag = "starwars.getVehicles.{$page}";
+            $cachedRes = $this->cache->getItem($cacheTag);
+            #   If not using cache or the value is not already cached...
+            if(!$this->useCache || !$cachedRes->isHit()){
+                $res = $this->guzzle->get(self::API_ENDPOINT . "/vehicles/?page=".$page);
                 
-            $res = $this->guzzle->get(self::API_ENDPOINT . "/vehicles/?page=".$page);
+                $cachedRes->set($res);
+                $cachedRes->expiresAfter(self::MINS_TO_EXPIRE_CACHE * 60);
+
+                $this->cache->save($cachedRes);
+            } else {
+                $res = $cachedRes->get();
+            }
             
             return json_decode($res);
 

@@ -32,10 +32,12 @@ class GetCharactersController extends AbstractController
         try {
 
             $page = (int) ($request->get("page") ?? 1);
+            $noCache = $request->get("noCache") && $request->get("noCache") == true ?: false;
 
             if ($page < 1)
                 throw new \Exception("Page number must be greater than 1", Response::HTTP_BAD_REQUEST);
 
+            $this->starWarsService->setCacheUsage(!$noCache);
 
             return new JsonResponse([
                 'status' => Response::HTTP_OK,
