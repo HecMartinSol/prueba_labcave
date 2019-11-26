@@ -49,7 +49,7 @@ The "front" view of the application is accesible though the following route:
 http://127.0.0.1:8000/character/viewer
 ```
 
-It is a simple HTML built with TWIG which uses the [JQuery] (https://jquery.com/) framework to make requests via AJAX 
+It is a simple HTML built with TWIG which uses the [JQuery](https://jquery.com/) framework to make requests via AJAX 
 to the "backend" and then processing the data and displaying it in a table constructed with [DataTables](https://datatables.net/) and [Bootstrap 4](https://getbootstrap.com/)
 
 This AJAX request is retrieving info via POST from the following route:
